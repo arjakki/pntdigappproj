@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Emergency Department — Patient Intake</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f1ea;
+    --paper: #fbf9f4;
+    --ink: #131414;
+    --ink-soft: #4a4a48;
+    --rule: #1a1a1a;
+    --muted: #8b8a85;
+    --accent: #c8341f;
+    --accent-deep: #8e1a0c;
+    --critical: #b91c1c;
+    --warning: #c97a16;
+    --stable: #2f6b3a;
+    --field-bg: #ffffff;
+    --field-border: #2a2a2a;
+    --hover: #ecead9;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background-image:
+      repeating-linear-gradient(0deg, transparent 0, transparent 23px, rgba(19,20,20,0.04) 23px, rgba(19,20,20,0.04) 24px),
+      radial-gradient(circle at 15% 10%, rgba(200,52,31,0.04), transparent 40%);
+    min-height: 100vh;
+    padding: 0 20px 80px;
+  }
+
+  /* Navigation bar */
+  .site-nav {
+    background: var(--ink);
+    padding: 10px 20px;
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .site-nav a {
+    padding: 6px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: rgba(255,255,255,0.6);
+    border: 1px solid transparent;
+    transition: all 0.12s;
+  }
+  .site-nav a:hover { color: #fff; border-color: rgba(255,255,255,0.4); }
+  .site-nav a.active { color: #fff; border-color: rgba(255,255,255,0.6); }
+
+  .form-shell {
+    max-width: 1080px;
+    margin: 0 auto;
+    background: var(--paper);
+    border: 1.5px solid var(--rule);
+    box-shadow:
+      0 1px 0 var(--rule),
+      8px 8px 0 -2px rgba(19,20,20,0.08),
+      0 30px 80px -20px rgba(19,20,20,0.25);
+    position: relative;
+  }
+
+  /* ============ MASTHEAD ============ */
+  .masthead {
+    border-bottom: 1.5px solid var(--rule);
+    padding: 24px 36px 22px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 28px;
+    align-items: end;
+    background: linear-gradient(180deg, rgba(200,52,31,0.06), transparent 60%);
+    position: relative;
+  }
+
+  .masthead::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: var(--accent);
+  }
+
+  .crest { display: flex; align-items: center; gap: 14px; }
+
+  .crest-mark {
+    width: 56px; height: 56px;
+    border: 1.5px solid var(--rule);
+    background: var(--accent);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    box-shadow: 3px 3px 0 var(--rule);
+  }
+  .crest-mark::before, .crest-mark::after { content: ''; position: absolute; background: #fff; }
+  .crest-mark::before { width: 28px; height: 6px; }
+  .crest-mark::after { width: 6px; height: 28px; }
+
+  .crest-text .org {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-soft);
+  }
+  .crest-text h1 {
+    font-family: 'Fraunces', serif; font-weight: 600; font-size: 28px;
+    letter-spacing: -0.01em; line-height: 1; margin-top: 4px;
+  }
+  .crest-text .sub { font-size: 12px; color: var(--ink-soft); margin-top: 4px; font-style: italic; }
+
+  .doc-label {
+    text-align: center;
+    border-left: 1.5px solid var(--rule); border-right: 1.5px solid var(--rule);
+    padding: 6px 24px; align-self: stretch;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .doc-label .form-num { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.15em; color: var(--ink-soft); }
+  .doc-label .form-title { font-family: 'Fraunces', serif; font-weight: 600; font-size: 18px; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.1; margin-top: 2px; }
+  .doc-label .form-class { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.2em; color: var(--accent); margin-top: 4px; font-weight: 600; }
+
+  .meta-block { display: grid; grid-template-columns: auto auto; gap: 4px 14px; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-align: right; }
+  .meta-block .label { color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .meta-block .value { color: var(--ink); font-weight: 600; }
+
+  /* ============ TRIAGE BAR ============ */
+  .triage-bar {
+    background: #1a1a1a; color: #fff;
+    padding: 18px 36px; display: flex; align-items: center; gap: 24px;
+    border-bottom: 1.5px solid var(--rule);
+  }
+  .triage-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(255,255,255,0.6); white-space: nowrap; }
+  .triage-levels { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; flex: 1; }
+  .triage-level { border: 1px solid rgba(255,255,255,0.2); padding: 10px 12px; cursor: pointer; transition: all 0.15s ease; background: transparent; color: #fff; text-align: left; font-family: inherit; position: relative; }
+  .triage-level:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.5); }
+  .triage-level input { display: none; }
+  .triage-level .lvl-num { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; line-height: 1; }
+  .triage-level .lvl-name { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 6px; font-weight: 600; }
+  .triage-level .lvl-desc { font-size: 10px; color: rgba(255,255,255,0.55); margin-top: 3px; line-height: 1.3; }
+  .triage-level[data-level="1"] .lvl-num { color: #ff4d3d; }
+  .triage-level[data-level="2"] .lvl-num { color: #ff8a3d; }
+  .triage-level[data-level="3"] .lvl-num { color: #ffd23d; }
+  .triage-level[data-level="4"] .lvl-num { color: #6fcf6f; }
+  .triage-level[data-level="5"] .lvl-num { color: #4d9eff; }
+  .triage-level.selected { background: rgba(255,255,255,0.12); border-color: #fff; }
+  .triage-level[data-level="1"].selected { color: #ff4d3d; box-shadow: inset 0 -3px 0 #ff4d3d; }
+  .triage-level[data-level="2"].selected { color: #ff8a3d; box-shadow: inset 0 -3px 0 #ff8a3d; }
+  .triage-level[data-level="3"].selected { color: #ffd23d; box-shadow: inset 0 -3px 0 #ffd23d; }
+  .triage-level[data-level="4"].selected { color: #6fcf6f; box-shadow: inset 0 -3px 0 #6fcf6f; }
+  .triage-level[data-level="5"].selected { color: #4d9eff; box-shadow: inset 0 -3px 0 #4d9eff; }
+
+  /* ============ FORM BODY ============ */
+  .form-body { padding: 32px 36px 16px; }
+  .section { margin-bottom: 36px; position: relative; }
+  .section-head { display: grid; grid-template-columns: auto 1fr auto; align-items: baseline; gap: 16px; border-bottom: 1.5px solid var(--rule); padding-bottom: 8px; margin-bottom: 20px; }
+  .section-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.15em; color: var(--accent); font-weight: 600; }
+  .section-title { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .section-meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+
+  /* ============ FIELD GRID ============ */
+  .grid { display: grid; gap: 14px 16px; }
+  .grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+  .grid.cols-6 { grid-template-columns: repeat(6, 1fr); }
+  .span-2 { grid-column: span 2; } .span-3 { grid-column: span 3; }
+  .span-4 { grid-column: span 4; } .span-full { grid-column: 1 / -1; }
+  .field { display: flex; flex-direction: column; }
+  .field label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 4px; font-weight: 600; }
+  .field label .req { color: var(--accent); margin-left: 3px; }
+  .field input[type="text"], .field input[type="tel"], .field input[type="email"],
+  .field input[type="date"], .field input[type="time"], .field input[type="number"],
+  .field select, .field textarea {
+    background: var(--field-bg); border: 1px solid var(--field-border); border-radius: 0;
+    padding: 9px 11px; font-family: 'Inter Tight', sans-serif; font-size: 14px;
+    color: var(--ink); transition: all 0.12s ease; width: 100%;
+  }
+  .field textarea { resize: vertical; min-height: 64px; line-height: 1.5; font-family: 'Fraunces', serif; }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none; border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(200,52,31,0.18), 2px 2px 0 var(--rule);
+  }
+  .field input::placeholder, .field textarea::placeholder { color: #b8b6ad; font-style: italic; }
+
+  /* ============ CHIP GROUPS ============ */
+  .chip-group { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+  .chip { border: 1px solid var(--field-border); background: var(--field-bg); padding: 6px 12px; cursor: pointer; transition: all 0.12s ease; font-size: 12px; font-family: 'Inter Tight', sans-serif; user-select: none; display: inline-flex; align-items: center; gap: 6px; }
+  .chip input { display: none; }
+  .chip:hover { background: var(--hover); }
+  .chip:has(input:checked) { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .chip:has(input:checked)::before { content: 'v'; font-size: 10px; color: var(--accent); }
+
+  /* ============ VITALS TABLE ============ */
+  .vitals-table { width: 100%; border-collapse: collapse; border: 1.5px solid var(--rule); background: var(--field-bg); }
+  .vitals-table th { background: var(--ink); color: var(--paper); font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; padding: 9px 10px; text-align: left; font-weight: 500; border-right: 1px solid rgba(255,255,255,0.15); }
+  .vitals-table th:last-child { border-right: none; }
+  .vitals-table td { padding: 0; border: 1px solid #d8d5cc; }
+  .vitals-table td input { border: none; background: transparent; padding: 10px 10px; width: 100%; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 500; }
+  .vitals-table td input:focus { outline: none; background: #fff8c5; }
+  .vitals-table tbody tr:nth-child(even) { background: #fafaf3; }
+  .vital-unit { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); margin-left: 4px; }
+
+  /* ============ PAIN SCALE ============ */
+  .pain-scale { display: grid; grid-template-columns: repeat(11, 1fr); gap: 4px; margin-top: 4px; }
+  .pain-cell { aspect-ratio: 1; border: 1px solid var(--field-border); background: var(--field-bg); display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: 'Fraunces', serif; font-weight: 600; font-size: 16px; transition: all 0.1s ease; position: relative; }
+  .pain-cell input { display: none; }
+  .pain-cell:hover { transform: translateY(-2px); box-shadow: 2px 2px 0 var(--rule); }
+  .pain-cell:has(input:checked) { background: var(--ink); color: var(--paper); border-color: var(--ink); transform: translateY(-2px); }
+  .pain-cell:nth-child(1)  { background: #f0fdf4; } .pain-cell:nth-child(2)  { background: #dcfce7; }
+  .pain-cell:nth-child(3)  { background: #bbf7d0; } .pain-cell:nth-child(4)  { background: #fef9c3; }
+  .pain-cell:nth-child(5)  { background: #fef08a; } .pain-cell:nth-child(6)  { background: #fed7aa; }
+  .pain-cell:nth-child(7)  { background: #fdba74; } .pain-cell:nth-child(8)  { background: #fb923c; color: white; }
+  .pain-cell:nth-child(9)  { background: #ea580c; color: white; } .pain-cell:nth-child(10) { background: #c2410c; color: white; }
+  .pain-cell:nth-child(11) { background: #7f1d1d; color: white; }
+  .pain-labels { display: flex; justify-content: space-between; margin-top: 6px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+
+  /* ============ BODY DIAGRAM ============ */
+  .body-diagram-wrap { display: grid; grid-template-columns: 220px 1fr; gap: 24px; align-items: start; }
+  .body-svg { border: 1px solid var(--field-border); background: var(--field-bg); padding: 12px; }
+  .body-svg svg { width: 100%; height: auto; display: block; }
+  .body-svg .clickable { fill: rgba(200,52,31,0.05); stroke: var(--ink-soft); stroke-width: 0.5; cursor: pointer; transition: fill 0.15s ease; }
+  .body-svg .clickable:hover { fill: rgba(200,52,31,0.3); }
+  .body-svg .clickable.active { fill: var(--accent); stroke: var(--accent-deep); stroke-width: 1; }
+  .body-svg-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-top: 6px; text-align: center; }
+
+  /* ============ DATA TABLES ============ */
+  .data-table { width: 100%; border-collapse: collapse; background: var(--field-bg); border: 1.5px solid var(--rule); }
+  .data-table thead th { background: var(--ink); color: var(--paper); font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; padding: 9px 10px; text-align: left; font-weight: 500; }
+  .data-table tbody td { border-top: 1px solid #e0ddd2; padding: 0; }
+  .data-table tbody td input { border: none; background: transparent; padding: 9px 10px; width: 100%; font-family: 'Inter Tight', sans-serif; font-size: 13px; }
+  .data-table tbody td input:focus { outline: none; background: #fff8c5; }
+
+  /* ============ Y/N GROUP ============ */
+  .yn-group { display: flex; gap: 4px; }
+  .yn-cell { flex: 1; border: 1px solid var(--field-border); background: var(--field-bg); padding: 7px 10px; text-align: center; cursor: pointer; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.1em; font-weight: 600; transition: all 0.1s ease; }
+  .yn-cell input { display: none; }
+  .yn-cell:hover { background: var(--hover); }
+  .yn-cell:has(input:checked) { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  /* ============ ALERT NOTE ============ */
+  .alert-note { background: linear-gradient(90deg, rgba(200,52,31,0.08), transparent); border-left: 3px solid var(--accent); padding: 12px 14px; font-size: 12px; color: var(--ink-soft); margin-bottom: 16px; font-style: italic; }
+  .alert-note strong { font-style: normal; color: var(--accent); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; font-size: 11px; text-transform: uppercase; margin-right: 8px; }
+
+  /* ============ FOOTER ============ */
+  .signoff { background: #f4f1ea; border-top: 1.5px solid var(--rule); padding: 28px 36px 32px; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 24px; align-items: end; }
+  .signoff-block label { display: block; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 8px; font-weight: 600; }
+  .signature-line { border-bottom: 1.5px solid var(--rule); height: 48px; background: repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(0,0,0,0.025) 8px, rgba(0,0,0,0.025) 9px); }
+  .signoff-meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); margin-top: 4px; letter-spacing: 0.05em; }
+
+  /* ============ ACTION BAR ============ */
+  .action-bar { background: var(--ink); color: var(--paper); padding: 20px 36px; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+  .legal { font-size: 11px; color: rgba(251,249,244,0.55); line-height: 1.5; max-width: 540px; font-style: italic; }
+  .btn-row { display: flex; gap: 10px; }
+  .btn { padding: 11px 22px; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 600; cursor: pointer; border: 1.5px solid transparent; transition: all 0.12s ease; }
+  .btn-secondary { background: transparent; color: var(--paper); border-color: rgba(251,249,244,0.4); }
+  .btn-secondary:hover { background: rgba(251,249,244,0.08); border-color: var(--paper); }
+  .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 3px 3px 0 var(--paper); }
+  .btn-primary:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--paper); }
+  .btn-primary:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--paper); }
+
+  /* ============ TOAST ============ */
+  .toast { position: fixed; bottom: 24px; right: 24px; padding: 14px 20px; font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.08em; border: 1.5px solid; z-index: 999; transition: opacity 0.3s; }
+  .toast.success { background: #f0fdf4; color: #166534; border-color: #166534; }
+  .toast.error { background: #fef2f2; color: var(--accent); border-color: var(--accent); }
+
+  .corner-stamp { position: absolute; top: 28px; right: 24px; border: 2px solid var(--accent); color: var(--accent); padding: 8px 14px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 700; transform: rotate(-4deg); opacity: 0.6; pointer-events: none; }
+
+  @media (max-width: 820px) {
+    .masthead { grid-template-columns: 1fr; gap: 16px; }
+    .triage-levels { grid-template-columns: repeat(2, 1fr); }
+    .grid.cols-2, .grid.cols-3, .grid.cols-4, .grid.cols-6 { grid-template-columns: 1fr; }
+    .span-2, .span-3, .span-4 { grid-column: span 1; }
+    .body-diagram-wrap { grid-template-columns: 1fr; }
+    .signoff { grid-template-columns: 1fr; }
+    .action-bar { flex-direction: column; }
+    .form-body { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="site-nav">
+  <a href="/">Dashboard</a>
+  <a href="/intake" class="active">Patient Intake</a>
+  <a href="/chat">AI Assistant</a>
+</nav>
+
+<form class="form-shell" id="intake-form">
+
+  <!-- MASTHEAD -->
+  <header class="masthead">
+    <div class="crest">
+      <div class="crest-mark" aria-hidden="true"></div>
+      <div class="crest-text">
+        <div class="org">Mercy Regional Medical Center</div>
+        <h1>Emergency Department</h1>
+        <div class="sub">24-Hour Acute Care &middot; Level I Trauma</div>
+      </div>
+    </div>
+    <div class="doc-label">
+      <div class="form-num">FORM &middot; ED-001 / Rev. 12</div>
+      <div class="form-title">Patient Intake</div>
+      <div class="form-class">For Clinical Use</div>
+    </div>
+    <div class="meta-block">
+      <span class="label">Arrival</span><span class="value" id="arrival-stamp">—</span>
+      <span class="label">MRN</span><span class="value" id="mrn-display">PENDING</span>
+      <span class="label">Bay</span><span class="value">— — —</span>
+      <span class="label">Provider</span><span class="value">UNASSIGNED</span>
+    </div>
+    <div class="corner-stamp">Confidential</div>
+  </header>
+
+  <!-- TRIAGE BAR -->
+  <div class="triage-bar">
+    <div class="triage-label">ESI<br/>Triage</div>
+    <div class="triage-levels" id="triage">
+      <label class="triage-level" data-level="1"><input type="radio" name="triage" value="1"><div class="lvl-num">1</div><div class="lvl-name">Resuscitation</div><div class="lvl-desc">Immediate, life-threatening</div></label>
+      <label class="triage-level" data-level="2"><input type="radio" name="triage" value="2"><div class="lvl-num">2</div><div class="lvl-name">Emergent</div><div class="lvl-desc">High risk, &lt; 10 min</div></label>
+      <label class="triage-level" data-level="3"><input type="radio" name="triage" value="3"><div class="lvl-num">3</div><div class="lvl-name">Urgent</div><div class="lvl-desc">Multiple resources</div></label>
+      <label class="triage-level" data-level="4"><input type="radio" name="triage" value="4"><div class="lvl-num">4</div><div class="lvl-name">Less Urgent</div><div class="lvl-desc">One resource</div></label>
+      <label class="triage-level" data-level="5"><input type="radio" name="triage" value="5"><div class="lvl-num">5</div><div class="lvl-name">Non-Urgent</div><div class="lvl-desc">No resources</div></label>
+    </div>
+  </div>
+
+  <div class="form-body">
+
+    <!-- SECTION 01 :: PATIENT IDENTIFICATION -->
+    <section class="section">
+      <div class="section-head">
+        <div class="section-num">01 &middot; SEC</div>
+        <h2 class="section-title">Patient Identification</h2>
+        <div class="section-meta">All fields required</div>
+      </div>
+      <div class="grid cols-6">
+        <div class="field span-2"><label>Last Name <span class="req">*</span></label><input type="text" name="lastName" required placeholder="Family / Surname"></div>
+        <div class="field span-2"><label>First Name <span class="req">*</span></label><input type="text" name="firstName" required placeholder="Given"></div>
+        <div class="field span-2"><label>Middle / Other</label><input type="text" name="middleName" placeholder="—"></div>
+        <div class="field span-2"><label>Date of Birth <span class="req">*</span></label><input type="date" name="dob" required></div>
+        <div class="field"><label>Age</label><input type="number" name="age" min="0" max="130" placeholder="yr"></div>
+        <div class="field"><label>Biological Sex <span class="req">*</span></label><select name="sex" required><option value="">—</option><option>Female</option><option>Male</option><option>Intersex</option></select></div>
+        <div class="field span-2"><label>Gender Identity</label><input type="text" name="gender" placeholder="As stated by patient"></div>
+        <div class="field span-2"><label>SSN / National ID</label><input type="text" name="ssn" placeholder="XXX-XX-XXXX"></div>
+        <div class="field span-2"><label>Government ID #</label><input type="text" name="govId" placeholder="Driver's license / Passport"></div>
+        <div class="field span-2"><label>Preferred Language <span class="req">*</span></label><select name="language" required><option value="">—</option><option>English</option><option>Spanish</option><option>Mandarin</option><option>Vietnamese</option><option>Tagalog</option><option>Arabic</option><option>Other (specify)</option></select></div>
+        <div class="field span-3"><label>Address</label><input type="text" name="address" placeholder="Street, City, State, ZIP"></div>
+        <div class="field span-2"><label>Phone <span class="req">*</span></label><input type="tel" name="phone" required placeholder="(___) ___ - ____"></div>
+        <div class="field"><label>Race / Ethnicity</label><input type="text" name="ethnicity" placeholder="Optional"></div>
+      </div>
+    </section>
+
+    <!-- SECTION 02 :: ARRIVAL -->
+    <section class="section">
+      <div class="section-head">
+        <div class="section-num">02 &middot; SEC</div>
+        <h2 class="section-title">Arrival &amp; Mode of Presentation</h2>
+        <div class="section-meta">Triage entry</div>
+      </div>
+      <div class="grid cols-4">
+        <div class="field"><label>Arrival Date <span class="req">*</span></label><input type="date" name="arrivalDate" required></div>
+        <div class="field"><label>Arrival Time <span class="req">*</span></label><input type="time" name="arrivalTime" required></div>
+        <div class="field span-2"><label>Mode of Arrival <span class="req">*</span></label><select name="arrivalMode" required><option value="">—</option><option>Walk-in / Ambulatory</option><option>EMS — Ground Ambulance</option><option>EMS — Air / LifeFlight</option><option>Police / Custody</option><option>Private Vehicle</option><option>Wheelchair</option><option>Inter-facility Transfer</option></select></div>
+        <div class="field span-2"><label>Accompanied By</label><input type="text" name="accompaniedBy" placeholder="Family / Friend / EMS / Alone"></div>
+        <div class="field span-2"><label>Referring Provider / Facility</label><input type="text" name="referringProvider" placeholder="If applicable"></div>
+        <div class="field span-full"><label>Chief Complaint — Patient's Own Words <span class="req">*</span></label><textarea name="chiefComplaint" required placeholder="Document verbatim. e.g., &ldquo;Chest pain, started 2 hours ago, feels heavy.&rdquo;"></textarea></div>
+        <div class="field span-2"><label>Onset</label><input type="text" name="onset" placeholder="Date &amp; time symptoms began"></div>
+        <div class="field span-2"><label>Duration</label><input type="text" name="duration" placeholder="Hours / days / sudden"></div>
+        <div class="field span-full"><label>Mechanism of Injury (if trauma)</label><input type="text" name="mechanism" placeholder="e.g., MVC at 45 mph, fall from 6 ft, blunt assault to head"></div>
+      </div>
+    </section>
+
+    <!-- SECTION 03 :: VITAL SIGNS -->
+    <section class="section">
+      <div class="section-head">
+        <div class="section-num">03 &middot; SEC</div>
+        <h2 class="section-title">Vital Signs &amp; Initial Assessment</h2>
+        <div class="section-meta">First reading on arrival</div>
+      </div>
+      <div class="alert-note"><strong>Note</strong>Re-assess every 15 min for ESI 1-2, every 30 min for ESI 3, hourly for ESI 4-5.</div>
+      <table class="vitals-table">
+        <thead><tr>
+          <th>Time</th><th>BP <span class="vital-unit">mmHg</span></th><th>HR <span class="vital-unit">bpm</span></th>
+          <th>RR <span class="vital-unit">/min</span></th><th>Temp <span class="vital-unit">F</span></th>
+          <th>SpO2 <span class="vital-unit">%</span></th><th>O2 Source</th><th>Glucose <span class="vital-unit">mg/dL</span></th><th>GCS</th>
+        </tr></thead>
+        <tbody>
+          <tr><td><input type="time" name="vt1"></td><td><input type="text" name="bp1" placeholder="120/80"></td><td><input type="number" name="hr1" placeholder="72"></td><td><input type="number" name="rr1" placeholder="16"></td><td><input type="number" name="temp1" step="0.1" placeholder="98.6"></td><td><input type="number" name="spo21" placeholder="98"></td><td><input type="text" name="o21" placeholder="RA / NC / NRB"></td><td><input type="number" name="glucose1" placeholder="100"></td><td><input type="number" name="gcs1" min="3" max="15" placeholder="15"></td></tr>
+          <tr><td><input type="time" name="vt2"></td><td><input type="text" name="bp2"></td><td><input type="number" name="hr2"></td><td><input type="number" name="rr2"></td><td><input type="number" name="temp2" step="0.1"></td><td><input type="number" name="spo22"></td><td><input type="text" name="o22"></td><td><input type="number" name="glucose2"></td><td><input type="number" name="gcs2" min="3" max="15"></td></tr>
+        </tbody>
+      </table>
+      <div class="grid cols-4" style="margin-top:16px;">
+        <div class="field"><label>Height</label><input type="text" name="height" placeholder="ft &middot; in / cm"></div>
+        <div class="field"><label>Weight</label><input type="text" name="weight" placeholder="lb / kg"></div>
+        <div class="field"><label>BMI</label><input type="number" step="0.1" name="bmi" placeholder="—"></div>
+        <div class="field"><label>Pregnancy Status</label><select name="pregnancy"><option value="">N/A</option><option>Not pregnant</option><option>Pregnant — confirmed</option><option>Possibly pregnant</option><option>Postpartum &lt; 6 wk</option></select></div>
+      </div>
+    </section>
+
+    <!-- SECTION 04 :: PAIN -->
+    <section class="section">
+      <div class="section-head">
+        <div class="section-num">04 &middot; SEC</div>
+        <h2 class="section-title">Pain Assessment &amp; Symptom Localization</h2>
+        <div class="section-meta">NRS 0–10 scale</div>
+      </div>
+      <div class="grid cols-2" style="margin-bottom:18px;">
+        <div>
+          <label style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;display:block;margin-bottom:6px;">Pain Severity (0 = none, 10 = worst imaginable)</label>
+          <div class="pain-scale" id="pain-scale"></div>
+          <div class="pain-labels"><span>No pain</span><span>Moderate</span><span>Worst</span></div>
+        </div>
+        <div class="grid cols-2">
+          <div class="field"><label>Pain Quality</label><select name="painQuality"><option value="">—</option><option>Sharp</option><option>Dull / Aching</option><option>Throbbing</option><option>Burning</option><option>Crushing / Pressure</option><option>Stabbing</option><option>Radiating</option><option>Cramping</option></select></div>
+          <div class="field"><label>Aggravating Factors</label><input type="text" name="aggravating" placeholder="Movement, breathing, etc."></div>
+          <div class="field"><label>Alleviating Factors</label><input type="text" name="alleviating" placeholder="Rest, position, meds"></div>
+          <div class="field"><label>Radiation</label><input type="text" name="radiation" placeholder="To arm, jaw, back…"></div>
+        </div>
+      </div>
+      <div class="body-diagram-wrap">
+        <div>
+          <div class="body-svg">
+            <svg viewBox="0 0 200 360" xmlns="http://www.w3.org/2000/svg">
+              <ellipse class="clickable" data-region="Head" cx="100" cy="32" rx="22" ry="26"/>
+              <rect class="clickable" data-region="Neck" x="90" y="56" width="20" height="14"/>
+              <path class="clickable" data-region="Chest" d="M65 70 Q100 65 135 70 L138 130 Q100 138 62 130 Z"/>
+              <path class="clickable" data-region="Abdomen" d="M68 132 Q100 138 132 132 L130 180 Q100 188 70 180 Z"/>
+              <path class="clickable" data-region="Pelvis" d="M70 182 Q100 188 130 182 L128 215 Q100 222 72 215 Z"/>
+              <path class="clickable" data-region="L Shoulder/Arm" d="M138 72 Q160 76 162 100 L158 160 Q150 165 142 162 L138 130 Z"/>
+              <path class="clickable" data-region="L Forearm" d="M158 162 L170 220 L160 222 L142 165 Z"/>
+              <ellipse class="clickable" data-region="L Hand" cx="167" cy="232" rx="9" ry="12"/>
+              <path class="clickable" data-region="R Shoulder/Arm" d="M62 72 Q40 76 38 100 L42 160 Q50 165 58 162 L62 130 Z"/>
+              <path class="clickable" data-region="R Forearm" d="M42 162 L30 220 L40 222 L58 165 Z"/>
+              <ellipse class="clickable" data-region="R Hand" cx="33" cy="232" rx="9" ry="12"/>
+              <path class="clickable" data-region="L Thigh" d="M100 222 L128 218 L122 295 L102 296 Z"/>
+              <path class="clickable" data-region="L Lower Leg" d="M102 297 L122 297 L118 345 L104 345 Z"/>
+              <ellipse class="clickable" data-region="L Foot" cx="111" cy="352" rx="11" ry="6"/>
+              <path class="clickable" data-region="R Thigh" d="M100 222 L72 218 L78 295 L98 296 Z"/>
+              <path class="clickable" data-region="R Lower Leg" d="M98 297 L78 297 L82 345 L96 345 Z"/>
+              <ellipse class="clickable" data-region="R Foot" cx="89" cy="352" rx="11" ry="6"/>
+            </svg>
+            <div class="body-svg-label">Anterior — Tap to mark pain site</div>
+          </div>
+        </div>
+        <div>
+          <label style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;display:block;margin-bottom:6px;">Selected Region(s)</label>
+          <div class="chip-group" id="selected-regions" style="min-height:40px;padding:8px;background:var(--field-bg);border:1px dashed var(--field-border);">
+            <span style="color:var(--muted);font-size:12px;font-style:italic;">No regions selected.</span>
+          </div>
+          <div class="grid cols-2" style="margin-top:16px;">
+            <div class="field span-2">
+              <label>Associated Symptoms</label>
+              <div class="chip-group">
+                <label class="chip"><input type="checkbox" name="symp" value="Nausea"> Nausea</label>
+                <label class="chip"><input type="checkbox" name="symp" value="Vomiting"> Vomiting</label>
+                <label class="chip"><input type="checkbox" name="symp" value="Fever"> Fever</label>
+                <label class="chip"><input type="checkbox" name="symp" value="Chills"> Chills</label>
+                <label class="chip"><input type="checkbox" name="symp" value="Dizziness"> Dizziness</label>
+                <label class="chip"><input type="checkbox" name="symp" value="Syncope"> Syncope</label>
+                <label class="chip"><input type="checkbox" name="symp" value="Headache"> Headache</label>
+                <label class="chip"><input type="checkbox" name="symp" value="SOB"> SOB</label>
+                <label class="chip"><input type="checkbox" name="symp" value="Palpitations"> Palpitations</label>
+                <label class="chip"><input type="checkbox" name="symp" value="Bleeding"> Bleeding</label>
+                <label class="chip"><input type="checkbox" name="symp" value="Numbness"> Numbness</label>
+                <label class="chip"><input type="checkbox" name="symp" value="Confusion"> Confusion</label>
+                <label class="chip"><input type="checkbox" name="symp" value="Seizure"> Seizure</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 05 :: ALLERGIES -->
+    <section class="section">
+      <div class="section-head">
+        <div class="section-num">05 &middot; SEC</div>
+        <h2 class="section-title">Allergies &amp; Current Medications</h2>
+        <div class="section-meta">Verify with patient &amp; pharmacy</div>
+      </div>
+      <label style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;display:block;margin-bottom:8px;">Known Allergies &amp; Reactions</label>
+      <table class="data-table">
+        <thead><tr><th style="width:30%">Allergen</th><th style="width:30%">Reaction Type</th><th style="width:20%">Severity</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><input type="text" placeholder="e.g., Penicillin"></td><td><input type="text" placeholder="Hives / Anaphylaxis"></td><td><input type="text" placeholder="Mild / Mod / Severe"></td><td><input type="text" placeholder="Last occurrence…"></td></tr>
+          <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+        </tbody>
+      </table>
+      <div style="display:flex;align-items:center;gap:14px;margin-top:10px;flex-wrap:wrap;">
+        <label class="chip"><input type="checkbox" name="nka"> No Known Drug Allergies</label>
+        <label class="chip"><input type="checkbox" name="nkfa"> No Known Food Allergies</label>
+        <label class="chip"><input type="checkbox" name="latex"> Latex Allergy</label>
+      </div>
+      <label style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;display:block;margin:22px 0 8px;">Current Medications</label>
+      <table class="data-table">
+        <thead><tr><th style="width:30%">Medication</th><th style="width:15%">Dose</th><th style="width:20%">Frequency</th><th style="width:15%">Route</th><th>Last Taken</th></tr></thead>
+        <tbody>
+          <tr><td><input type="text" placeholder="Drug name"></td><td><input type="text" placeholder="10 mg"></td><td><input type="text" placeholder="BID / Daily"></td><td><input type="text" placeholder="PO / IV"></td><td><input type="text" placeholder="Date / time"></td></tr>
+          <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- SECTION 06 :: EMERGENCY CONTACT -->
+    <section class="section">
+      <div class="section-head">
+        <div class="section-num">06 &middot; SEC</div>
+        <h2 class="section-title">Emergency Contact &amp; Coverage</h2>
+        <div class="section-meta">Notification &amp; billing</div>
+      </div>
+      <div class="grid cols-4">
+        <div class="field span-2"><label>Emergency Contact Name <span class="req">*</span></label><input type="text" name="ecName" required></div>
+        <div class="field"><label>Relationship</label><input type="text" name="ecRel" placeholder="Spouse / Parent…"></div>
+        <div class="field"><label>Phone <span class="req">*</span></label><input type="tel" name="ecPhone" required></div>
+        <div class="field span-2"><label>Insurance Provider</label><input type="text" name="insurance" placeholder="Carrier name"></div>
+        <div class="field"><label>Member ID</label><input type="text" name="memberId"></div>
+        <div class="field"><label>Group #</label><input type="text" name="groupId"></div>
+      </div>
+    </section>
+
+    <!-- SECTION 07 :: TRIAGE NOTE -->
+    <section class="section">
+      <div class="section-head">
+        <div class="section-num">07 &middot; SEC</div>
+        <h2 class="section-title">Triage Nurse Note &amp; Initial Plan</h2>
+        <div class="section-meta">Clinical synthesis</div>
+      </div>
+      <div class="field">
+        <label>Triage Narrative</label>
+        <textarea rows="4" name="triageNote" placeholder="Free-text clinical impression, decision-making, initial interventions…"></textarea>
+      </div>
+      <div class="grid cols-3" style="margin-top:14px;">
+        <div class="field"><label>Initial Disposition</label><select name="disposition"><option value="">—</option><option>Main ED — Bay assignment</option><option>Fast Track</option><option>Trauma Bay</option><option>Resuscitation Room</option><option>Behavioral Health</option><option>Waiting Room — Re-triage</option><option>Direct Admit</option></select></div>
+        <div class="field"><label>Triage Nurse Name <span class="req">*</span></label><input type="text" name="triageNurse" required placeholder="RN Full Name"></div>
+        <div class="field"><label>Isolation Needed?</label><select name="isolation"><option value="">— None —</option><option>Contact</option><option>Droplet</option><option>Airborne</option><option>Reverse / Neutropenic</option></select></div>
+      </div>
+    </section>
+
+  </div><!-- /form-body -->
+
+  <!-- SIGN-OFF -->
+  <div class="signoff">
+    <div class="signoff-block"><label>Patient / Authorized Representative Signature</label><div class="signature-line"></div><div class="signoff-meta">By signing, patient consents to treatment and examination.</div></div>
+    <div class="signoff-block"><label>Triage RN</label><div class="signature-line"></div><div class="signoff-meta">Print name &middot; License #</div></div>
+    <div class="signoff-block"><label>Date / Time</label><div class="signature-line"></div><div class="signoff-meta">MM / DD / YYYY &middot; HH:MM</div></div>
+  </div>
+
+  <!-- ACTION BAR -->
+  <div class="action-bar">
+    <div class="legal">Protected Health Information — Subject to HIPAA, 45 CFR § 164. Unauthorized disclosure prohibited. EMTALA-compliant medical screening will be performed regardless of ability to pay.</div>
+    <div class="btn-row">
+      <button type="button" class="btn btn-secondary" onclick="window.print()">Print</button>
+      <button type="reset" class="btn btn-secondary">Clear</button>
+      <button type="submit" class="btn btn-primary" id="submit-btn">Submit to Triage &rarr;</button>
+    </div>
+  </div>
+
+</form>
+
+<!-- Toast -->
+<div class="toast" id="toast" style="display:none"></div>
+
+<script>
+// Arrival timestamp
+(function() {
+  const now = new Date();
+  document.getElementById('arrival-stamp').textContent =
+    now.toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'}).toUpperCase() +
+    ' · ' + now.toTimeString().slice(0,5);
+  // Pre-fill arrival date/time
+  const form = document.getElementById('intake-form');
+  const pad = n => String(n).padStart(2,'0');
+  const dateStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+  const timeStr = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  if (form.arrivalDate) form.arrivalDate.value = dateStr;
+  if (form.arrivalTime) form.arrivalTime.value = timeStr;
+})();
+
+// Auto-generate MRN
+(function() {
+  const year = new Date().getFullYear();
+  const rand = String(Math.floor(Math.random() * 900) + 100).padStart(3,'0');
+  const mrn = `MRN-${year}-${rand}`;
+  document.getElementById('mrn-display').textContent = mrn;
+  window._generatedMRN = mrn;
+})();
+
+// Triage selection
+document.querySelectorAll('.triage-level').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.triage-level').forEach(t => t.classList.remove('selected'));
+    el.classList.add('selected');
+  });
+});
+
+// Pain scale
+(function() {
+  const scale = document.getElementById('pain-scale');
+  for (let i = 0; i <= 10; i++) {
+    const lbl = document.createElement('label');
+    lbl.className = 'pain-cell';
+    lbl.innerHTML = `<input type="radio" name="painLevel" value="${i}"><span>${i}</span>`;
+    scale.appendChild(lbl);
+  }
+})();
+
+// Body diagram
+(function() {
+  const selected = new Set();
+  const container = document.getElementById('selected-regions');
+  document.querySelectorAll('.body-svg .clickable').forEach(el => {
+    el.addEventListener('click', () => {
+      const r = el.dataset.region;
+      if (selected.has(r)) { selected.delete(r); el.classList.remove('active'); }
+      else { selected.add(r); el.classList.add('active'); }
+      container.innerHTML = selected.size === 0
+        ? '<span style="color:var(--muted);font-size:12px;font-style:italic;">No regions selected.</span>'
+        : [...selected].map(r => `<span class="chip" style="background:var(--ink);color:var(--paper);border-color:var(--ink);">${r}</span>`).join('');
+    });
+  });
+})();
+
+// Toast helper
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type}`;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 5000);
+}
+
+// Form submission → API
+document.getElementById('intake-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const data = new FormData(form);
+  const esiLevel = parseInt(document.querySelector('input[name="triage"]:checked')?.value || '3');
+
+  const payload = {
+    mrn: window._generatedMRN,
+    first_name: data.get('firstName') || '',
+    last_name: data.get('lastName') || '',
+    dob: data.get('dob') || '',
+    age: parseInt(data.get('age') || '0'),
+    biological_sex: data.get('sex') || '',
+    phone: data.get('phone') || '',
+    address: data.get('address') || '',
+    language: data.get('language') || 'English',
+    chief_complaint: data.get('chiefComplaint') || '',
+    esi_level: esiLevel,
+    arrival_mode: data.get('arrivalMode') || 'Walk-in / Ambulatory',
+    arrival_date: data.get('arrivalDate') || new Date().toISOString().slice(0,10),
+    arrival_time: data.get('arrivalTime') || '00:00',
+    triage_nurse: data.get('triageNurse') || 'Triage RN',
+    disposition: data.get('disposition') || 'Main ED — Bay assignment',
+  };
+
+  const btn = document.getElementById('submit-btn');
+  btn.textContent = 'Submitting…';
+  btn.disabled = true;
+
+  try {
+    const resp = await fetch('/api/intake', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload),
+    });
+    const result = await resp.json();
+    if (result.success) {
+      showToast(`Patient ${payload.last_name}, ${payload.first_name} submitted — MRN: ${payload.mrn} | Triage ID: ${result.triage_id}`, 'success');
+      setTimeout(() => window.location.href = '/', 2500);
+    } else {
+      showToast(`Error: ${result.error}`, 'error');
+      btn.textContent = 'Submit to Triage →'; btn.disabled = false;
+    }
+  } catch (err) {
+    showToast(`Network error: ${err.message}`, 'error');
+    btn.textContent = 'Submit to Triage →'; btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>
