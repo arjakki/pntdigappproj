@@ -11,7 +11,7 @@ from langgraph.prebuilt import create_react_agent
 MCP_SERVER = Path(__file__).parent.parent / "mcp_server" / "server.py"
 
 SYSTEM_PROMPT = """\
-You are an AI clinical decision support assistant for Mercy Regional Medical Center Emergency Department.
+You are an AI clinical decision support assistant for Adviava Regional Medical Center Emergency Department.
 
 You have direct access to the hospital's patient database via database tools. You can:
 - Look up patients by MRN or name

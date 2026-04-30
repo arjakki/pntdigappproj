@@ -117,7 +117,7 @@ def _on_page(cv, doc):
     cv.saveState()
     cv.setFillColor(MUTED)
     cv.setFont('Helvetica', 7)
-    cv.drawString(cm, 0.65*cm, 'ED AI Agent — Technical Architecture & Integration Reference — Mercy Regional Medical Center')
+    cv.drawString(cm, 0.65*cm, 'ED AI Agent — Technical Architecture & Integration Reference — Adviava Regional Medical Center')
     cv.drawRightString(W - cm, 0.65*cm, f'Page {doc.page}')
     cv.setStrokeColor(RULE)
     cv.setLineWidth(0.5)
@@ -934,7 +934,7 @@ def build_pdf(out_path: str):
         leftMargin=1.8*cm, rightMargin=1.8*cm,
         topMargin=2*cm, bottomMargin=1.8*cm,
         title='ED AI Agent — Technical Architecture',
-        author='Mercy Regional Medical Center',
+        author='Adviava Regional Medical Center',
         subject='Technical Architecture & Integration Reference',
     )
     DW = doc.width   # usable page width
@@ -982,7 +982,7 @@ def build_pdf(out_path: str):
     story.append(H('About This Document', S_H3))
     story.append(P(
         'This document describes the complete technical architecture of the ED AI Agent platform '
-        'built for Mercy Regional Medical Center\'s Emergency Department. The system integrates a '
+        'built for Adviava Regional Medical Center\'s Emergency Department. The system integrates a '
         'LangChain ReAct agent powered by Claude Sonnet 4.6 with a MySQL-compatible MCP (Model '
         'Context Protocol) server that provides the AI direct access to patient records, triage '
         'data, vital signs, medications, and allergy records stored in a relational database.'
@@ -1195,7 +1195,7 @@ def build_pdf(out_path: str):
     # Footer note
     story.append(HRFlowable(width='100%', color=ACCENT, thickness=1.5, spaceAfter=8))
     story.append(Paragraph(
-        f'<b>ED AI Agent Platform</b>  ·  Mercy Regional Medical Center  ·  '
+        f'<b>ED AI Agent Platform</b>  ·  Adviava Regional Medical Center  ·  '
         f'Version 1.0  ·  Generated {datetime.now().strftime("%B %d, %Y at %H:%M")}',
         _ps(fontName='Helvetica', fontSize=8, textColor=MUTED, alignment=TA_CENTER)
     ))

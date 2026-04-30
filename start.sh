@@ -1,7 +1,7 @@
 #!/bin/bash
 echo ""
 echo "=========================================="
-echo " ED AI Agent - Mercy Regional Medical Center"
+echo " ED AI Agent - Adviava Regional Medical Center"
 echo " LangChain + MySQL MCP + Claude Sonnet"
 echo "=========================================="
 echo ""
