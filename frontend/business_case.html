@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ED AI Agent — Business Case</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f4f1ea; --paper:#fbf9f4; --ink:#131414; --ink-soft:#4a4a48;
+  --muted:#8b8a85; --accent:#c8341f; --accent-deep:#8e1a0c;
+  --rule:#1a1a1a; --hover:#ecead9;
+  --navy:#0d2b4e; --teal:#007c91; --teal-lite:#e0f4f7;
+  --gold:#d4a017; --green:#2d7a3a; --purple:#5a4fa0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink);font-family:'Inter Tight',sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body{background-image:repeating-linear-gradient(0deg,transparent 0,transparent 23px,rgba(19,20,20,0.04) 23px,rgba(19,20,20,0.04) 24px);min-height:100vh}
+
+.shell{max-width:1200px;margin:0 auto;padding:0 20px 80px}
+
+/* ── Header ─────────────────────────────────────────────── */
+.header{border-bottom:1.5px solid var(--rule);background:var(--paper);position:relative;padding:20px 28px 18px;display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center;margin-bottom:32px;box-shadow:0 2px 0 rgba(19,20,20,0.06)}
+.header::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:var(--accent)}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-mark{width:44px;height:44px;background:var(--accent);position:relative;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--rule)}
+.brand-mark::before,.brand-mark::after{content:'';position:absolute;background:#fff}
+.brand-mark::before{width:22px;height:5px}
+.brand-mark::after{width:5px;height:22px}
+.brand-name{font-family:'Fraunces',serif;font-size:22px;font-weight:600;line-height:1}
+.brand-sub{font-size:11px;color:var(--ink-soft);margin-top:2px}
+.nav{display:flex;gap:4px}
+.nav a{padding:8px 14px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;color:var(--ink-soft);border:1px solid transparent;transition:all 0.12s}
+.nav a:hover{background:var(--hover);border-color:var(--rule)}
+.nav a.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.tag{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase}
+
+/* ── Hero ───────────────────────────────────────────────── */
+.hero{background:var(--navy);color:#fff;padding:40px 48px;margin-bottom:32px;position:relative;overflow:hidden;border:1.5px solid var(--rule)}
+.hero::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--gold)}
+.hero::after{content:'';position:absolute;bottom:0;right:0;width:220px;height:100%;background:linear-gradient(135deg,transparent 0%,rgba(255,255,255,0.03) 100%);pointer-events:none}
+.hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-bottom:10px}
+.hero-title{font-family:'Fraunces',serif;font-size:38px;font-weight:700;line-height:1.1;margin-bottom:8px}
+.hero-title span{color:var(--gold)}
+.hero-org{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;color:rgba(255,255,255,0.5);margin-bottom:20px}
+.hero-body{font-size:14px;color:rgba(255,255,255,0.78);max-width:620px;line-height:1.65}
+.hero-dl{position:absolute;top:32px;right:48px;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.dl-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;background:var(--teal);color:#fff;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;border:1px solid rgba(255,255,255,0.15);transition:all 0.15s;cursor:pointer}
+.dl-btn:hover{background:#005f70;transform:translateY(-1px)}
+.dl-btn svg{width:14px;height:14px;fill:currentColor}
+
+/* ── KPI strip ──────────────────────────────────────────── */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:32px}
+.kpi{background:var(--paper);border:1.5px solid var(--rule);padding:20px 22px;position:relative;overflow:hidden}
+.kpi::after{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--accent)}
+.kpi-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted)}
+.kpi-value{font-family:'Fraunces',serif;font-size:40px;font-weight:700;line-height:1;margin-top:6px}
+.kpi-value.teal{color:var(--teal)}
+.kpi-value.gold{color:var(--gold)}
+.kpi-value.red{color:var(--accent)}
+.kpi-value.navy{color:var(--navy)}
+.kpi-sub{font-size:11px;color:var(--muted);margin-top:4px}
+
+/* ── Section headers ────────────────────────────────────── */
+.sec-wrap{margin-bottom:32px}
+.sec-header{display:flex;align-items:baseline;gap:14px;margin-bottom:16px;padding-bottom:10px;border-bottom:1.5px solid var(--rule)}
+.sec-num{font-family:'Fraunces',serif;font-size:48px;font-weight:700;color:rgba(19,20,20,0.08);line-height:1;flex-shrink:0}
+.sec-title{font-family:'Fraunces',serif;font-size:22px;font-weight:600}
+.sec-title span{color:var(--teal)}
+
+/* ── Problem cards ──────────────────────────────────────── */
+.problem-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:32px}
+.prob-card{background:var(--paper);border:1.5px solid var(--rule);padding:22px 20px;position:relative;transition:transform 0.15s,box-shadow 0.15s}
+.prob-card:hover{transform:translateY(-3px);box-shadow:4px 4px 0 var(--rule)}
+.prob-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent)}
+.prob-icon{font-size:28px;margin-bottom:10px}
+.prob-title{font-family:'Fraunces',serif;font-size:15px;font-weight:600;margin-bottom:8px}
+.prob-body{font-size:12.5px;color:var(--ink-soft);line-height:1.6}
+.prob-stat{display:inline-block;margin-top:12px;padding:4px 10px;background:var(--accent);color:#fff;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em}
+
+/* ── Two-col layout ─────────────────────────────────────── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:32px}
+.panel{background:var(--paper);border:1.5px solid var(--rule);padding:24px}
+.panel h3{font-family:'Fraunces',serif;font-size:17px;font-weight:600;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(19,20,20,0.12)}
+
+/* ── Value list ─────────────────────────────────────────── */
+.value-list{display:flex;flex-direction:column;gap:10px}
+.value-item{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;background:var(--bg);border-left:3px solid var(--teal)}
+.value-item .vi-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.value-item .vi-body{font-size:12.5px;line-height:1.55;color:var(--ink-soft)}
+.value-item .vi-body strong{color:var(--ink)}
+
+/* ── Capability query table ─────────────────────────────── */
+.cap-table-wrap{background:var(--paper);border:1.5px solid var(--rule);margin-bottom:32px;overflow:hidden}
+.cap-table-wrap .t-head{background:var(--ink);color:var(--paper);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.cap-table-wrap .t-head h3{font-family:'Fraunces',serif;font-size:17px;font-weight:600}
+.cap-table-wrap .t-head .tag{color:rgba(255,255,255,0.45)}
+table.cap{width:100%;border-collapse:collapse}
+table.cap thead th{background:var(--navy);color:#fff;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;padding:10px 16px;text-align:left;font-weight:500}
+table.cap tbody tr{border-bottom:1px solid #e8e5da;transition:background 0.1s}
+table.cap tbody tr:hover{background:var(--hover)}
+table.cap tbody td{padding:11px 16px;font-size:12.5px}
+table.cap tbody td:first-child{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--teal);font-style:italic}
+.arrow-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:var(--teal-lite);color:var(--teal);font-family:'JetBrains Mono',monospace;font-size:9.5px;border:1px solid var(--teal);letter-spacing:0.06em}
+
+/* ── Financial table ────────────────────────────────────── */
+table.fin{width:100%;border-collapse:collapse}
+table.fin thead th{background:var(--teal);color:#fff;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;padding:10px 14px;text-align:left}
+table.fin tbody tr{border-bottom:1px solid #e8e5da}
+table.fin tbody tr:nth-child(even){background:rgba(0,124,145,0.04)}
+table.fin tbody tr:hover{background:var(--hover)}
+table.fin tbody td{padding:10px 14px;font-size:12.5px;color:var(--ink-soft)}
+table.fin tbody td:first-child{color:var(--ink);font-weight:500}
+table.fin tbody td:last-child{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--navy);font-weight:600}
+.highlight-row td{background:rgba(212,160,23,0.08) !important;color:var(--ink) !important}
+.highlight-row td:last-child{color:var(--gold) !important;font-size:13px !important}
+
+/* ── Timeline roadmap ───────────────────────────────────── */
+.roadmap{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-bottom:32px;border:1.5px solid var(--rule);overflow:hidden}
+.phase{padding:26px 22px;position:relative}
+.phase:not(:last-child){border-right:1.5px solid var(--rule)}
+.phase-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:6px}
+.phase-title{font-family:'Fraunces',serif;font-size:16px;font-weight:700;margin-bottom:14px}
+.phase-items{display:flex;flex-direction:column;gap:8px}
+.phase-item{font-size:12px;color:var(--ink-soft);line-height:1.55;padding-left:14px;position:relative}
+.phase-item::before{content:'';position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%}
+.phase.now{background:var(--navy)}
+.phase.now .phase-label{color:rgba(255,255,255,0.4)}
+.phase.now .phase-title{color:#fff}
+.phase.now .phase-item{color:rgba(255,255,255,0.72)}
+.phase.now .phase-item::before{background:var(--gold)}
+.phase.near{background:var(--paper)}
+.phase.near .phase-label{color:var(--teal)}
+.phase.near .phase-title{color:var(--teal)}
+.phase.near .phase-item::before{background:var(--teal)}
+.phase.future{background:var(--bg)}
+.phase.future .phase-label{color:var(--purple)}
+.phase.future .phase-title{color:var(--purple)}
+.phase.future .phase-item::before{background:var(--purple)}
+.phase-bar{height:5px;position:absolute;bottom:0;left:0;right:0}
+.phase.now .phase-bar{background:var(--gold)}
+.phase.near .phase-bar{background:var(--teal)}
+.phase.future .phase-bar{background:var(--purple)}
+
+/* ── Why today / future cards ───────────────────────────── */
+.why-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:32px}
+.why-card{background:var(--paper);border:1.5px solid var(--rule);padding:22px;position:relative;overflow:hidden}
+.why-card .wc-num{font-family:'Fraunces',serif;font-size:52px;font-weight:700;color:rgba(19,20,20,0.06);position:absolute;top:8px;right:14px;line-height:1}
+.why-card .wc-tag{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.why-card .wc-title{font-family:'Fraunces',serif;font-size:15px;font-weight:600;margin-bottom:10px}
+.why-card .wc-body{font-size:12.5px;color:var(--ink-soft);line-height:1.6}
+.why-card.today::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--teal)}
+.why-card.future::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--purple)}
+.stat-pill{display:inline-block;margin-top:10px;padding:3px 10px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;border:1px solid currentColor}
+.stat-pill.teal{color:var(--teal);background:var(--teal-lite)}
+.stat-pill.purple{color:var(--purple);background:rgba(90,79,160,0.08)}
+
+/* ── Summary callout ────────────────────────────────────── */
+.summary-block{background:var(--navy);color:#fff;padding:40px 48px;margin-bottom:32px;border:1.5px solid var(--rule);position:relative;overflow:hidden}
+.summary-block::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--gold)}
+.summary-block h2{font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--gold);margin-bottom:24px}
+.sentence-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.sc{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);padding:20px;position:relative}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.sc.prob::before{background:var(--accent)}
+.sc.sol::before{background:var(--teal)}
+.sc.imp::before{background:var(--gold)}
+.sc-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:8px}
+.sc-text{font-size:12.5px;color:rgba(255,255,255,0.82);line-height:1.65}
+
+/* ── Footer strip ───────────────────────────────────────── */
+.footer-strip{background:var(--paper);border:1.5px solid var(--rule);padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+.footer-strip .ft-left{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase}
+.footer-strip .ft-right{font-size:11px;color:var(--muted)}
+.tech-tags{display:flex;gap:6px;flex-wrap:wrap}
+.tech-tag{padding:3px 9px;background:var(--bg);border:1px solid rgba(19,20,20,0.2);font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.08em;color:var(--ink-soft)}
+
+@media(max-width:900px){
+  .kpi-strip,.problem-grid,.two-col,.why-grid,.sentence-cards,.roadmap{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+  .kpi-strip,.problem-grid,.two-col,.why-grid,.sentence-cards,.roadmap{grid-template-columns:1fr}
+  .hero{padding:28px 24px}
+  .hero-dl{position:static;margin-top:18px;align-items:flex-start}
+  .hero-title{font-size:26px}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ── Header ─────────────────────────────────────────── -->
+  <div class="header">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div>
+        <div class="brand-name">Emergency Department</div>
+        <div class="brand-sub">Adviava Regional Medical Center · AI Agent</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <a href="/">Dashboard</a>
+      <a href="/intake">Patient Intake</a>
+      <a href="/chat">AI Assistant</a>
+      <a href="/business-case" class="active">Business Case</a>
+    </nav>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);text-align:right">
+      April 2026<br>Confidential
+    </div>
+  </div>
+
+  <!-- ── Hero ───────────────────────────────────────────── -->
+  <div class="hero">
+    <div class="hero-eyebrow">Business Case &amp; Value Analysis</div>
+    <div class="hero-title">ED AI Agent —<br><span>Why It Matters</span></div>
+    <div class="hero-org">Adviava Regional Medical Center · Emergency Department</div>
+    <div class="hero-body">
+      An AI-powered clinical decision support platform that gives emergency medicine staff
+      instant, natural-language access to patient records, triage data, medication histories,
+      and critical alerts — connected in real time to the hospital's patient database via the
+      <strong style="color:#fff">Model Context Protocol (MCP)</strong>.
+    </div>
+    <div class="hero-dl">
+      <a class="dl-btn" href="/static/Adviava_ED_AI_Agent_Business_Case.pdf" download>
+        <svg viewBox="0 0 24 24"><path d="M12 16l-6-6h4V4h4v6h4l-6 6zm-7 2h14v2H5v-2z"/></svg>
+        Download PDF
+      </a>
+    </div>
+  </div>
+
+  <!-- ── KPI strip ──────────────────────────────────────── -->
+  <div class="kpi-strip">
+    <div class="kpi">
+      <div class="kpi-label">Annual US ED Visits</div>
+      <div class="kpi-value red">145M</div>
+      <div class="kpi-sub">Operating at or beyond capacity</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Shift Time Lost to EHR Navigation</div>
+      <div class="kpi-value navy">35%</div>
+      <div class="kpi-sub">Should be spent on direct patient care</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">ED Physician Burnout Rate</div>
+      <div class="kpi-value gold">62%</div>
+      <div class="kpi-sub">Highest of any medical specialty</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Est. Annual Savings / Dept.</div>
+      <div class="kpi-value teal">$361K</div>
+      <div class="kpi-sub">Conservative nursing efficiency estimate</div>
+    </div>
+  </div>
+
+  <!-- ── Section 1: The Problem ─────────────────────────── -->
+  <div class="sec-wrap">
+    <div class="sec-header">
+      <div class="sec-num">01</div>
+      <div class="sec-title">The Business Problem — <span>Emergency Departments Are in Crisis</span></div>
+    </div>
+    <div class="problem-grid">
+      <div class="prob-card">
+        <div class="prob-icon">⏱️</div>
+        <div class="prob-title">Clinicians Spend More Time Searching Than Treating</div>
+        <div class="prob-body">Studies show emergency physicians spend up to 35% of their shift navigating fragmented EHR systems — 6–10 minutes per patient locating allergy records, medication lists, and prior visit history buried across multiple screens.</div>
+        <div class="prob-stat">6–10 min / patient</div>
+      </div>
+      <div class="prob-card">
+        <div class="prob-icon">⚠️</div>
+        <div class="prob-title">Information Gaps Cause Preventable Harm</div>
+        <div class="prob-body">Medication errors affect 1.3 million people annually in the US. Missed allergy flags cause thousands of preventable adverse reactions. Every 10-minute delay in sepsis care increases patient mortality risk by 7%.</div>
+        <div class="prob-stat">1.3M medication errors / yr</div>
+      </div>
+      <div class="prob-card">
+        <div class="prob-icon">🔥</div>
+        <div class="prob-title">Staff Burnout Is at Breaking Point</div>
+        <div class="prob-body">62% of emergency physicians report burnout — driven by administrative and cognitive burden, not clinical work. Turnover costs $40,000–$60,000 per ED nurse. The US faces a projected shortage of 124,000 physicians by 2034.</div>
+        <div class="prob-stat">$40K–$60K turnover cost</div>
+      </div>
+      <div class="prob-card">
+        <div class="prob-icon">🏥</div>
+        <div class="prob-title">EDs Are Operating Over Capacity</div>
+        <div class="prob-body">145 million annual US ED visits. Average wait of 2h 15m before seeing a physician. 1 in 5 patients leaves without being seen. ED crowding is directly correlated with increased patient mortality.</div>
+        <div class="prob-stat">1 in 5 patients leave LWBS</div>
+      </div>
+      <div class="prob-card">
+        <div class="prob-icon">🗂️</div>
+        <div class="prob-title">Healthcare Data Is Fragmented</div>
+        <div class="prob-body">Hospitals operate with patient data siloed across EHR systems, pharmacy, labs, radiology PACS, and legacy ADT platforms. Staff context-switch between 5–10 systems per patient interaction. The right information exists but cannot be reached fast enough.</div>
+        <div class="prob-stat">5–10 systems per patient</div>
+      </div>
+      <div class="prob-card">
+        <div class="prob-icon">💸</div>
+        <div class="prob-title">Financial Impact Is Significant</div>
+        <div class="prob-body">Adverse drug events cost an average $4,700 per incident. LWBS patients represent $1,500+ in lost revenue per visit. Malpractice exposure, agency staffing costs, and CMS quality score penalties compound the financial drain.</div>
+        <div class="prob-stat">$4,700 avg per adverse event</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 2: The Solution ────────────────────────── -->
+  <div class="sec-wrap">
+    <div class="sec-header">
+      <div class="sec-num">02</div>
+      <div class="sec-title">The Solution — <span>What the ED AI Agent Does</span></div>
+    </div>
+
+    <!-- Capability table -->
+    <div class="cap-table-wrap" style="margin-bottom:20px">
+      <div class="t-head">
+        <h3>Natural-Language Clinical Queries</h3>
+        <span class="tag">9 MCP Database Tools</span>
+      </div>
+      <table class="cap">
+        <thead>
+          <tr>
+            <th>Staff Query</th>
+            <th>Agent Action</th>
+            <th>Time Saved</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>"Show me all critical patients right now"</td>
+            <td>Queries ESI 1–2 triage records with vitals and known allergies</td>
+            <td><span class="arrow-chip">~8 min → 10 sec</span></td>
+          </tr>
+          <tr>
+            <td>"What medications is the patient on?"</td>
+            <td>Fetches complete medication list with dosage, route, frequency</td>
+            <td><span class="arrow-chip">~5 min → 8 sec</span></td>
+          </tr>
+          <tr>
+            <td>"Who is allergic to penicillin today?"</td>
+            <td>Cross-references allergy records against today's arrivals</td>
+            <td><span class="arrow-chip">~10 min → 12 sec</span></td>
+          </tr>
+          <tr>
+            <td>"What were the patient's vitals on arrival?"</td>
+            <td>Pulls triage record and first vital sign set by MRN</td>
+            <td><span class="arrow-chip">~4 min → 7 sec</span></td>
+          </tr>
+          <tr>
+            <td>"How many arrived by ambulance this week?"</td>
+            <td>Runs aggregation query across triage records</td>
+            <td><span class="arrow-chip">~15 min → 6 sec</span></td>
+          </tr>
+          <tr>
+            <td>"Register a new patient — chest pain, ESI 2"</td>
+            <td>Writes a new patient intake record to the database</td>
+            <td><span class="arrow-chip">~6 min → 45 sec</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Value + Financial side-by-side -->
+    <div class="two-col">
+      <div class="panel">
+        <h3>Patient Safety Improvements</h3>
+        <div class="value-list">
+          <div class="value-item">
+            <div class="vi-icon">🛡️</div>
+            <div class="vi-body"><strong>Allergy warnings surface automatically</strong> — the agent proactively flags contraindications every time a patient with known allergies is queried</div>
+          </div>
+          <div class="value-item">
+            <div class="vi-icon">📊</div>
+            <div class="vi-body"><strong>Abnormal vital thresholds are hard-coded</strong> (HR &gt; 100, SBP &lt; 90, SpO₂ &lt; 95%) and flagged in every patient summary</div>
+          </div>
+          <div class="value-item">
+            <div class="vi-icon">🔴</div>
+            <div class="vi-body"><strong>ESI 1–2 patients always highlighted as critical</strong>, reducing risk of high-acuity patients being overlooked in a crowded department</div>
+          </div>
+          <div class="value-item">
+            <div class="vi-icon">📋</div>
+            <div class="vi-body"><strong>Code status (Full Code vs. DNR)</strong> is surfaced with every patient record, preventing inappropriate resuscitation</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Financial Impact — Conservative Estimates</h3>
+        <table class="fin">
+          <thead>
+            <tr><th>Metric</th><th>Estimate</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Time saved per nurse per shift</td><td>1.5 hours</td></tr>
+            <tr><td>Nurses in ED per shift</td><td>12</td></tr>
+            <tr><td>Hourly nursing cost</td><td>$55</td></tr>
+            <tr><td>Daily efficiency savings</td><td>~$990 / day</td></tr>
+            <tr class="highlight-row"><td>Annual savings (one department)</td><td>~$361,000 / year</td></tr>
+            <tr><td>Adverse drug event cost (avg)</td><td>$4,700 — reduced</td></tr>
+            <tr><td>LWBS revenue recovery (avg visit)</td><td>$1,500 — captured</td></tr>
+          </tbody>
+        </table>
+        <p style="font-size:11px;color:var(--muted);margin-top:10px">Excludes reduced malpractice exposure, improved CMS quality scores, and lower agency staffing costs.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 3: Why Today ────────────────────────────── -->
+  <div class="sec-wrap">
+    <div class="sec-header">
+      <div class="sec-num">03</div>
+      <div class="sec-title">Why This Is <span>Critical Today</span></div>
+    </div>
+    <div class="why-grid">
+      <div class="why-card today">
+        <div class="wc-num">1</div>
+        <div class="wc-tag">AI Capability</div>
+        <div class="wc-title">The AI Inflection Point in Healthcare</div>
+        <div class="wc-body">2024–2026 marks the first practical window in which large language models are sufficiently capable and cost-effective to deploy clinically. AI inference costs have dropped 100× in three years — deploying an intelligent agent per query now costs cents, not dollars.</div>
+        <span class="stat-pill teal">100× cost reduction</span>
+      </div>
+      <div class="why-card today">
+        <div class="wc-num">2</div>
+        <div class="wc-tag">Protocol Standard</div>
+        <div class="wc-title">Model Context Protocol Changes Integration</div>
+        <div class="wc-body">MCP (2024) provides a standardized, secure interface between AI models and any database or data source — making integrations achievable in days instead of months. The same protocol will connect to Epic FHIR, labs, and real-time monitors with zero changes to the agent.</div>
+        <span class="stat-pill teal">Days not months</span>
+      </div>
+      <div class="why-card today">
+        <div class="wc-num">3</div>
+        <div class="wc-tag">Reimbursement</div>
+        <div class="wc-title">Regulatory and Reimbursement Pressure</div>
+        <div class="wc-body">CMS star ratings and HCAHPS scores now drive reimbursement. Hospitals measured on readmission rates, patient safety indicators, and quality metrics — all directly improved by AI decision support. The FDA has established a clear regulatory pathway for clinical decision support software.</div>
+        <span class="stat-pill teal">Value-based care mandate</span>
+      </div>
+      <div class="why-card today">
+        <div class="wc-num">4</div>
+        <div class="wc-tag">Competition</div>
+        <div class="wc-title">Competitive Differentiation Is Real</div>
+        <div class="wc-body">Health systems compete for patients, physicians, and nurses. An ED offering faster triage decisions, fewer medication errors, and demonstrably better outcomes attracts better talent and stronger patient volumes. AI-assisted care is rapidly becoming a marketing differentiator.</div>
+        <span class="stat-pill teal">Act now or fall behind</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 4: Why Future ────────────────────────────── -->
+  <div class="sec-wrap">
+    <div class="sec-header">
+      <div class="sec-num">04</div>
+      <div class="sec-title">Why This Will Be <span>Even More Critical in the Future</span></div>
+    </div>
+    <div class="why-grid">
+      <div class="why-card future">
+        <div class="wc-num">1</div>
+        <div class="wc-tag">Workforce</div>
+        <div class="wc-title">The Physician Shortage Gets Worse</div>
+        <div class="wc-body">The US physician shortage, projected at 124,000 by 2034, cannot be solved by training more doctors. AI is the only realistic force multiplier — allowing existing staff to manage larger patient panels without proportional increase in cognitive load.</div>
+        <span class="stat-pill purple">124K shortage by 2034</span>
+      </div>
+      <div class="why-card future">
+        <div class="wc-num">2</div>
+        <div class="wc-tag">Multimodal AI</div>
+        <div class="wc-title">Radiology, Vitals &amp; Notes — All Queryable</div>
+        <div class="wc-body">Within 2–3 years the same conversational interface will surface CT/X-ray interpretations, continuous vital streams from bedside monitors, and unstructured clinical notes — alongside structured EHR data. Voice interfaces will enable hands-free querying during active resuscitation.</div>
+        <span class="stat-pill purple">Multimodal within 2–3 years</span>
+      </div>
+      <div class="why-card future">
+        <div class="wc-num">3</div>
+        <div class="wc-tag">Interoperability</div>
+        <div class="wc-title">FHIR Mandates Drive Data Accessibility</div>
+        <div class="wc-body">The 21st Century Cures Act and CMS Interoperability Rule mandate patient data accessibility via FHIR APIs. As data becomes available, the bottleneck shifts entirely to intelligent query and synthesis — exactly what this architecture provides.</div>
+        <span class="stat-pill purple">Zero code changes to swap DB</span>
+      </div>
+      <div class="why-card future">
+        <div class="wc-num">4</div>
+        <div class="wc-tag">Autonomy</div>
+        <div class="wc-title">Autonomous Agent Workflows Are Next</div>
+        <div class="wc-body">Proactive vital alerts, autonomously drafted discharge instructions, AI-generated shift handoff briefings, real-time sepsis and stroke risk scoring. Each capability is a direct extension of the current ReAct agent loop — built on this architecture today.</div>
+        <span class="stat-pill purple">Foundation is built now</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 5: Roadmap ──────────────────────────────── -->
+  <div class="sec-wrap">
+    <div class="sec-header">
+      <div class="sec-num">05</div>
+      <div class="sec-title">Strategic <span>Roadmap</span></div>
+    </div>
+    <div class="roadmap">
+      <div class="phase now">
+        <div class="phase-label">Phase 1</div>
+        <div class="phase-title">Now — 6 Months</div>
+        <div class="phase-items">
+          <div class="phase-item">Integrate with production EHR via FHIR API</div>
+          <div class="phase-item">Pilot with triage nurses on single ED shift</div>
+          <div class="phase-item">Add proactive allergy conflict checking</div>
+          <div class="phase-item">CISO sign-off — HIPAA compliance posture</div>
+        </div>
+        <div class="phase-bar"></div>
+      </div>
+      <div class="phase near">
+        <div class="phase-label">Phase 2</div>
+        <div class="phase-title">6–18 Months</div>
+        <div class="phase-items">
+          <div class="phase-item">Extend to ICU, med-surg, and surgical floors</div>
+          <div class="phase-item">Add voice interface for hands-free querying</div>
+          <div class="phase-item">Real-time vital sign ingestion from monitors</div>
+          <div class="phase-item">Staff simulation training program</div>
+        </div>
+        <div class="phase-bar"></div>
+      </div>
+      <div class="phase future">
+        <div class="phase-label">Phase 3</div>
+        <div class="phase-title">18–36 Months</div>
+        <div class="phase-items">
+          <div class="phase-item">ML models — sepsis, stroke, ACS risk scoring</div>
+          <div class="phase-item">Autonomous shift handoff synthesis</div>
+          <div class="phase-item">Multi-hospital federated deployment</div>
+          <div class="phase-item">Revenue cycle — AI-assisted coding</div>
+        </div>
+        <div class="phase-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 6: Summary ─────────────────────────────── -->
+  <div class="summary-block">
+    <h2>The Case in Three Sentences</h2>
+    <div class="sentence-cards">
+      <div class="sc prob">
+        <div class="sc-label">The Problem</div>
+        <div class="sc-text">Emergency Departments are drowning in fragmented data, under-resourced staff, and time pressure that turns information delays into patient harm.</div>
+      </div>
+      <div class="sc sol">
+        <div class="sc-label">The Solution</div>
+        <div class="sc-text">The ED AI Agent directly attacks the root cause — not by adding more staff or replacing clinicians, but by eliminating the minutes of system navigation that stand between a clinician and the information they need to act.</div>
+      </div>
+      <div class="sc imp">
+        <div class="sc-label">The Imperative</div>
+        <div class="sc-text">This conversational-AI-over-clinical-data architecture will become the standard interface layer for every hospital department — and the organizations that build it now will lead the ones that build it later.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Footer ─────────────────────────────────────────── -->
+  <div class="footer-strip">
+    <div class="ft-left">Adviava Regional Medical Center · Confidential · April 2026</div>
+    <div class="tech-tags">
+      <span class="tech-tag">FastAPI</span>
+      <span class="tech-tag">LangChain</span>
+      <span class="tech-tag">Claude Sonnet 4.6</span>
+      <span class="tech-tag">MCP</span>
+      <span class="tech-tag">SQLite / FHIR</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

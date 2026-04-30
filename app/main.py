@@ -51,6 +51,11 @@ async def intake_page():
     return FileResponse(FRONTEND / "intake.html")
 
 
+@app.get("/business-case")
+async def business_case_page():
+    return FileResponse(FRONTEND / "business_case.html")
+
+
 # ─── API ──────────────────────────────────────────────────────────────────────
 
 @app.post("/api/chat", response_model=ChatResponse)
